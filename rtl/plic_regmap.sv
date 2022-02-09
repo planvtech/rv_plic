@@ -1,5 +1,8 @@
 // Do not edit - auto-generated
-module plic_regs (
+module plic_regs #(
+  parameter type reg_req_t  = logic,
+  parameter type reg_rsp_t  = logic
+)(
   input logic [30:0][2:0] prio_i,
   output logic [30:0][2:0] prio_o,
   output logic [30:0] prio_we_o,
@@ -19,8 +22,8 @@ module plic_regs (
   output logic [1:0] cc_we_o,
   output logic [1:0] cc_re_o,
   // Bus Interface
-  input  reg_intf::reg_intf_req_a32_d32 req_i,
-  output reg_intf::reg_intf_resp_d32    resp_o
+  input  reg_req_t req_i,
+  output reg_rsp_t resp_o
 );
 always_comb begin
   resp_o.ready = 1'b1;
@@ -32,7 +35,6 @@ always_comb begin
   ie_o = '0;
   ie_we_o = '0;
   ie_re_o = '0;
-  ip_re_o = '0;
   threshold_o = '0;
   threshold_we_o = '0;
   threshold_re_o = '0;
@@ -352,3 +354,4 @@ always_comb begin
   end
 end
 endmodule
+

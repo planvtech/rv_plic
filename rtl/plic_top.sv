@@ -1,14 +1,30 @@
+// Copyright 2022 ETH Zurich and University of Bologna.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the "License"); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
+//
+// Author:  Florian Zaruba <zaruabf@iis.ee.ethz.ch>
+//
+// Description: Platform level interrupt controller
+
 module plic_top #(
   parameter int N_SOURCE    = 30,
   parameter int N_TARGET    = 2,
   parameter int MAX_PRIO    = 7,
-  parameter int SRCW        = $clog2(N_SOURCE+1)
+  parameter int SRCW        = $clog2(N_SOURCE+1),
+  parameter type reg_req_t  = logic,
+  parameter type reg_rsp_t  = logic
 ) (
   input  logic clk_i,    // Clock
   input  logic rst_ni,  // Asynchronous reset active low
   // Bus Interface
-  input  reg_intf::reg_intf_req_a32_d32 req_i,
-  output reg_intf::reg_intf_resp_d32    resp_o,
+  input  reg_req_t req_i,
+  output reg_rsp_t resp_o,
   input logic [N_SOURCE-1:0] le_i, // 0:level 1:edge
   // Interrupt Sources
   input  logic [N_SOURCE-1:0] irq_sources_i,
@@ -83,7 +99,10 @@ module plic_top #(
   logic [N_TARGET-1:0][N_SOURCE:0] ie_i, ie_o;
   logic [N_TARGET-1:0] ie_we_o;
 
-  plic_regs i_plic_regs (
+  plic_regs #(
+    .reg_req_t ( reg_req_t ),
+    .reg_rsp_t ( reg_rsp_t )
+  ) i_plic_regs (
     .prio_i(prio_i),
     .prio_o(prio_o),
     .prio_we_o(prio_we_o),

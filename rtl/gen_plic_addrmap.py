@@ -61,7 +61,10 @@ class AddrMap:
   """Dump Verilog"""
   def emit_verilog(self):
     output = "// Do not edit - auto-generated\n"
-    output += "module {} (\n".format(self.name)
+    params =",\n".join(map(lambda x: "  " + x, [
+      "parameter type reg_req_t  = logic",
+      "parameter type reg_rsp_t  = logic"]))
+    output += "module {} {}(\n".format(self.name, "#(\n{}\n)".format(params))
     for i in self.ports:
       # self.ports.append((name, num, width, access))
       if i[3] == Access.RO:
@@ -73,8 +76,8 @@ class AddrMap:
         output += "  output logic [{}:0] {}_we_o,\n".format(i[1]-1, i[0])
         output += "  output logic [{}:0] {}_re_o,\n".format(i[1]-1, i[0])
     output += "  // Bus Interface\n"
-    output += "  input  reg_intf::reg_intf_req_a32_d32 req_i,\n"
-    output += "  output reg_intf::reg_intf_resp_d32    resp_o\n"
+    output += "  input  reg_req_t req_i,\n"
+    output += "  output reg_rsp_t resp_o\n"
     output += ");\n"
     output += "always_comb begin\n"
     output += "  resp_o.ready = 1'b1;\n"
